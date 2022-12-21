@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from fake_useragent import UserAgent
-
-from . import utils
+from ..utils import generator_sec_websocket_key
 
 
 class FakeHeader:
@@ -19,10 +17,7 @@ class FakeHeader:
         else:
             self._origin = "https://kr.tradingview.com"
 
-        self.fake_user_agent = UserAgent()
-
     def _set_fake_user_agent(self):
-        # self.headers['User-Agent'] = self.fake_user_agent.random
         self.headers[
             'User-Agent'] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.19582"
         return self
@@ -36,7 +31,7 @@ class FakeHeader:
         return self
 
     def _set_sec_websocket_key(self):
-        self.headers["Sec-WebSocket-Key"] = utils.generator_sec_websocket_key()
+        self.headers["Sec-WebSocket-Key"] = generator_sec_websocket_key()
         return self
 
     def _set_upgrade(self):
