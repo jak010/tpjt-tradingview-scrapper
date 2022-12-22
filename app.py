@@ -6,7 +6,7 @@ import time
 
 from websocket import WebSocketApp
 
-from lib import constant
+import constant
 from lib import utils
 from lib.http.FakeHeader import FakeHeader
 from lib.websocket.dispatcher.open_dispatcher import WebSocketOpenDispatcher
