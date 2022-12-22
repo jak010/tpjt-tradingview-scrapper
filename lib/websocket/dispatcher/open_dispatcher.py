@@ -1,6 +1,4 @@
-import json
-
-from ..method import interface_functions
+from ..method import send_functions
 
 
 class WebSocketOpenDispatcher:
@@ -18,34 +16,34 @@ class WebSocketOpenDispatcher:
 
     @property
     def on_authorized_token(self) -> str:
-        return interface_functions.get_authorized_token()
+        return send_functions.get_authorized_token()
 
     @property
     def on_chart_create_session(self) -> str:
-        return interface_functions.get_chart_create_session(
+        return send_functions.get_chart_create_session(
             chart_session_id=self._chart_session_id
         )
 
     @property
     def on_quote_create_session(self) -> str:
-        return interface_functions.get_quote_create_session(
+        return send_functions.get_quote_create_session(
             session_id=self._session_id
         )
 
     @property
     def on_quote_set_fields(self) -> str:
-        return interface_functions.get_quote_set_fields(
+        return send_functions.get_quote_set_fields(
             session_id=self._session_id
         )
 
     @property
     def on_quote_hibernate_all(self):
-        return interface_functions.get_quote_hibernate_all(
+        return send_functions.get_quote_hibernate_all(
             session_id=self._session_id
         )
 
     def on_quote_add_symbols(self):
-        return interface_functions.get_quote_add_symbols(
+        return send_functions.get_quote_add_symbols(
             session_id=self._session_id,
             symbols="FX:EURUSD",
             flags={"flags": ['force_permission']}
@@ -55,14 +53,14 @@ class WebSocketOpenDispatcher:
         """
         symbol_name - > FX:EURUSD
         """
-        return interface_functions.get_resolve_symbol(
+        return send_functions.get_resolve_symbol(
             chart_session_id=self._chart_session_id,
             param1="symbol_1",
             param2="={\"adjustment\":\"splits\",\"symbol\":\"FX:EURUSD\"}"
         )
 
     def on_create_series(self):
-        return interface_functions.get_create_series(
+        return send_functions.get_create_series(
             chart_session_id=self._chart_session_id,
             param1="s1",
             param2="s1",
@@ -72,13 +70,13 @@ class WebSocketOpenDispatcher:
         )
 
     def on_quote_fast_symbols(self):
-        return interface_functions.get_quote_fast_symbols(
+        return send_functions.get_quote_fast_symbols(
             session_id=self._session_id,
             symbols="FX:EURUSD"
         )
 
     def on_create_study(self):
-        return interface_functions.get_create_study(
+        return send_functions.get_create_study(
             chart_session_id=self._chart_session_id,
             param1="st1",
             param2="st1",

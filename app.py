@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import re
 import threading
 import time
@@ -7,10 +8,11 @@ import time
 from websocket import WebSocketApp
 
 import constant
+from ast import literal_eval
 from lib import utils
 from lib.http.FakeHeader import FakeHeader
 from lib.websocket.dispatcher.open_dispatcher import WebSocketOpenDispatcher
-from lib.websocket.method import interface_functions
+from lib.websocket.method import send_functions, dto
 
 
 class TradingViewScrapingWebSocketApp(WebSocketApp):
@@ -30,25 +32,36 @@ class TradingViewScrapingWebSocketApp(WebSocketApp):
 
     def on_message(self, ws, recv_msg):
         def chart_left_shift(*args):
-            time.sleep(20)
-            print('*' * 30)
-            self.send(interface_functions.get_request_more_tickmarks(
+            time.sleep(5)
+            self.send(send_functions.get_request_more_tickmarks(
                 chart_session_id=self._chart_session_id
             ))
-            time.sleep(20)
-            self.send(interface_functions.get_request_more_data(
+            time.sleep(5)
+            self.send(send_functions.get_request_more_data(
                 chart_session_id=self._chart_session_id
             ))
-            print('*' * 30)
 
         rex_search_payload_length = re.search(r"~m~(?P<length>\d[0-9]+)~m~", recv_msg)
-        if rex_search_payload_length is not None:
-            f = re.split(r"~m~(?P<length>\d[0-9]+)~m~", recv_msg)
-            for x in f:
-                print(x)
-            print("\n")
 
-        self.re_send(recv_msg=recv_msg)
+        if rex_search_payload_length is not None:
+
+            if int(rex_search_payload_length.group('length')) > 1:
+                recv_msg_split = re.split(r"~m~(?P<length>\d[0-9]+)~m~", recv_msg)
+
+                for token in recv_msg_split:
+                    try:
+                        token_to_obj = literal_eval(token)
+                        if isinstance(token_to_obj, dict):
+                            timescaleupdate_dto = dto.TimeScaleUpdateMessageDto(token_to_obj)
+                            print(timescaleupdate_dto)
+
+                    except Exception as e:
+                        pass
+                        # token_to_json = json.dumps(token)
+                        # token_to_json = literal_eval(token_to_json)
+                        # print(token_to_json)
+
+        self.health_check(recv_msg=recv_msg)
 
         threading.Thread(
             target=chart_left_shift,
@@ -75,9 +88,9 @@ class TradingViewScrapingWebSocketApp(WebSocketApp):
         print(">>>> CLOSED")
 
     def on_error(self, ws, msg):
-        print(ws, msg)
+        print("[*]Error", ws, msg)
 
-    def re_send(self, recv_msg):
+    def health_check(self, recv_msg):
         pattern = re.compile("~m~\d+~m~~h~\d+$")
         if pattern.match(recv_msg):
             self.send(recv_msg)
@@ -85,6 +98,6 @@ class TradingViewScrapingWebSocketApp(WebSocketApp):
 
 if __name__ == '__main__':
     app = TradingViewScrapingWebSocketApp(
-        trading_view_wss_url=constant.TRADING_VIEW_WSS_URL
+        trading_view_wss_url=constant.TRADING_VIEW_WSS_URL + constant.TEST_PARAM
     )
     app.run_forever()
