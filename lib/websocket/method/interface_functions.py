@@ -116,5 +116,5 @@ def get_request_more_tickmarks(chart_session_id):
 def get_request_more_data(chart_session_id):
     return Payload(
         func="request_more_data",
-        parameters=[chart_session_id, "sds_1", 10]
+        parameters=[chart_session_id, "s1", 10]
     ).get_payload()

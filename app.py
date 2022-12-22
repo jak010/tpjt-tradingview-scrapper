@@ -1,18 +1,17 @@
 from __future__ import annotations
 
 import re
+import threading
+import time
 
 from websocket import WebSocketApp
 
 from lib import constant
-
 from lib import utils
 from lib.http.FakeHeader import FakeHeader
 from lib.websocket.dispatcher.open_dispatcher import WebSocketOpenDispatcher
-
 from lib.websocket.method import interface_functions
-import logging
-logging.basicConfig(level=-1)
+
 
 class TradingViewScrapingWebSocketApp(WebSocketApp):
 
@@ -30,45 +29,50 @@ class TradingViewScrapingWebSocketApp(WebSocketApp):
         )
 
     def on_message(self, ws, recv_msg):
-        print("\n")
-        print("[*]", recv_msg)
-        print(len(recv_msg))
-        print("=" * 25)
+        def chart_left_shift(*args):
+            time.sleep(20)
+            print('*' * 30)
+            self.send(interface_functions.get_request_more_tickmarks(
+                chart_session_id=self._chart_session_id
+            ))
+            time.sleep(20)
+            self.send(interface_functions.get_request_more_data(
+                chart_session_id=self._chart_session_id
+            ))
+            print('*' * 30)
+
+        rex_search_payload_length = re.search(r"~m~(?P<length>\d[0-9]+)~m~", recv_msg)
+        if rex_search_payload_length is not None:
+            f = re.split(r"~m~(?P<length>\d[0-9]+)~m~", recv_msg)
+            for x in f:
+                print(x)
+            print("\n")
+
         self.re_send(recv_msg=recv_msg)
+
+        threading.Thread(
+            target=chart_left_shift,
+            daemon=True
+        ).start()
 
     def on_open(self, ws):
         websocketopendispatcher = WebSocketOpenDispatcher(
             session_id=self._session_id,
             chart_session_id=self._chart_session_id
         )
-        self.send(websocketopendispatcher.set_authorized_token)
-        self.send(websocketopendispatcher.set_chart_create_session)
-        self.send(websocketopendispatcher.set_quote_create_session)
-        self.send(websocketopendispatcher.set_quote_add_symbols())
-        self.send(websocketopendispatcher.set_get_quote_set_fields)
-        self.send(websocketopendispatcher.set_resolve_symobl())
-        self.send(websocketopendispatcher.set_create_series())
-        self.send(websocketopendispatcher.set_quote_fast_symbols())
-        self.send(websocketopendispatcher.set_create_study())
-        self.send(websocketopendispatcher.set_quote_hibernate_all)
-
-        def tmp():
-            import time
-            time.sleep(5)
-            print('*' * 30)
-            # self.send(interface_functions.get_request_more_tickmarks(
-            #     chart_session_id=self._chart_session_id
-            # ))
-            self.send(interface_functions.get_request_more_data(
-                chart_session_id=self._chart_session_id
-            ))
-
-        import threading
-        threading.Thread(target=tmp).start()
+        self.send(websocketopendispatcher.on_authorized_token)
+        self.send(websocketopendispatcher.on_chart_create_session)
+        self.send(websocketopendispatcher.on_quote_create_session)
+        self.send(websocketopendispatcher.on_quote_add_symbols())
+        self.send(websocketopendispatcher.on_quote_set_fields)
+        self.send(websocketopendispatcher.on_resolve_symobl())
+        self.send(websocketopendispatcher.on_create_series())
+        self.send(websocketopendispatcher.on_quote_fast_symbols())
+        self.send(websocketopendispatcher.on_create_study())
+        self.send(websocketopendispatcher.on_quote_hibernate_all)
 
     def on_close(self, *args, **kwargs):
-        print(args, kwargs)
-        exit()
+        print(">>>> CLOSED")
 
     def on_error(self, ws, msg):
         print(ws, msg)
@@ -77,13 +81,9 @@ class TradingViewScrapingWebSocketApp(WebSocketApp):
         pattern = re.compile("~m~\d+~m~~h~\d+$")
         if pattern.match(recv_msg):
             self.send(recv_msg)
-            # self.send(interface_functions.get_request_more_data(
-            #     chart_session_id=self._chart_session_id
-            # ))
 
 
 if __name__ == '__main__':
-
     app = TradingViewScrapingWebSocketApp(
         trading_view_wss_url=constant.TRADING_VIEW_WSS_URL
     )

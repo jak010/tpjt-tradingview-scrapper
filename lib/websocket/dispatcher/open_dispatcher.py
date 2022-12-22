@@ -17,41 +17,41 @@ class WebSocketOpenDispatcher:
         self._chart_session_id = chart_session_id
 
     @property
-    def set_authorized_token(self):
+    def on_authorized_token(self) -> str:
         return interface_functions.get_authorized_token()
 
     @property
-    def set_chart_create_session(self):
+    def on_chart_create_session(self) -> str:
         return interface_functions.get_chart_create_session(
             chart_session_id=self._chart_session_id
         )
 
     @property
-    def set_quote_create_session(self):
+    def on_quote_create_session(self) -> str:
         return interface_functions.get_quote_create_session(
             session_id=self._session_id
         )
 
     @property
-    def set_get_quote_set_fields(self):
+    def on_quote_set_fields(self) -> str:
         return interface_functions.get_quote_set_fields(
             session_id=self._session_id
         )
 
     @property
-    def set_quote_hibernate_all(self):
+    def on_quote_hibernate_all(self):
         return interface_functions.get_quote_hibernate_all(
             session_id=self._session_id
         )
 
-    def set_quote_add_symbols(self):
+    def on_quote_add_symbols(self):
         return interface_functions.get_quote_add_symbols(
             session_id=self._session_id,
             symbols="FX:EURUSD",
             flags={"flags": ['force_permission']}
         )
 
-    def set_resolve_symobl(self):
+    def on_resolve_symobl(self):
         """
         symbol_name - > FX:EURUSD
         """
@@ -61,7 +61,7 @@ class WebSocketOpenDispatcher:
             param2="={\"adjustment\":\"splits\",\"symbol\":\"FX:EURUSD\"}"
         )
 
-    def set_create_series(self):
+    def on_create_series(self):
         return interface_functions.get_create_series(
             chart_session_id=self._chart_session_id,
             param1="s1",
@@ -71,13 +71,13 @@ class WebSocketOpenDispatcher:
             param5=300
         )
 
-    def set_quote_fast_symbols(self):
+    def on_quote_fast_symbols(self):
         return interface_functions.get_quote_fast_symbols(
             session_id=self._session_id,
             symbols="FX:EURUSD"
         )
 
-    def set_create_study(self):
+    def on_create_study(self):
         return interface_functions.get_create_study(
             chart_session_id=self._chart_session_id,
             param1="st1",
