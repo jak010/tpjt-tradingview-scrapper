@@ -26,14 +26,7 @@ class TimeScaleUpdateMessageDto:
         return self.recv_msg.get('t_ms', None)
 
     def __str__(self):
-        print(f"{self.__class__.__name__}(t: {datetime.fromtimestamp(self.t)}, t_ms:{self.t_ms})")
-
-        print(self.parmeters.position2_of_key_in_s1.keys())
-        # 과거 데이터
-        for each in self.parmeters.position2_of_key_in_s1_in_s:
-            print(datetime.fromtimestamp(each['v'][0]), each['v'])
-
-        return "*" * 100
+        return f"{self.__class__.__name__}(t: {datetime.fromtimestamp(self.t)}, t_ms:{self.t_ms})"
 
 
 class TiemScaleUpdateMessageParamterData:

@@ -4,7 +4,7 @@ import json
 import re
 import threading
 import time
-
+from datetime import datetime
 from websocket import WebSocketApp
 
 import constant
@@ -53,7 +53,13 @@ class TradingViewScrapingWebSocketApp(WebSocketApp):
                         token_to_obj = literal_eval(token)
                         if isinstance(token_to_obj, dict):
                             timescaleupdate_dto = dto.TimeScaleUpdateMessageDto(token_to_obj)
-                            print(timescaleupdate_dto)
+
+                            if timescaleupdate_dto.parmeters.position2_of_key_in_s1_in_s:
+                                # 과거 데이터
+                                print("*" * 100)
+                                print(timescaleupdate_dto)
+                                for each in timescaleupdate_dto.parmeters.position2_of_key_in_s1_in_s:
+                                    print(datetime.fromtimestamp(each['v'][0]), each['v'])
 
                     except Exception as e:
                         pass
