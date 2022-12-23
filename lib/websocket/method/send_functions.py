@@ -114,7 +114,8 @@ def get_request_more_tickmarks(chart_session_id):
 
 
 def get_request_more_data(chart_session_id):
+    _chunk_size = 150
     return Payload(
         func="request_more_data",
-        parameters=[chart_session_id, "s1", 25]
+        parameters=[chart_session_id, "s1", _chunk_size]
     ).get_payload()

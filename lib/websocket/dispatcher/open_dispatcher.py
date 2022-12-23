@@ -1,4 +1,5 @@
 from ..method import send_functions
+import json
 
 
 class WebSocketOpenDispatcher:
@@ -42,45 +43,49 @@ class WebSocketOpenDispatcher:
             session_id=self._session_id
         )
 
-    def on_quote_add_symbols(self):
+    def on_quote_add_symbols(self, symbol_name):
         return send_functions.get_quote_add_symbols(
             session_id=self._session_id,
-            symbols="FX:EURUSD",
-            flags={"flags": ['force_permission']}
+            symbols="FX_IDC:" + symbol_name,
+            flags={}
+            # flags={"flags": ['force_permission']}
         )
 
-    def on_resolve_symobl(self):
+    def on_resolve_symobl(self, symbol_name):
         """
         symbol_name - > FX:EURUSD
         """
+
+        _template = '={"adjustment":"splits","sds_sym_1", "symbols":"FX:"%s"}' % symbol_name
+
         return send_functions.get_resolve_symbol(
             chart_session_id=self._chart_session_id,
             param1="symbol_1",
-            param2="={\"adjustment\":\"splits\",\"symbol\":\"FX:EURUSD\"}"
+            param2=_template
         )
 
     def on_create_series(self):
         return send_functions.get_create_series(
             chart_session_id=self._chart_session_id,
-            param1="s1",
+            param1="sds_1",
             param2="s1",
-            param3="symbol_1",
+            param3="sds_sym_1",
             param4="D",
             param5=300
         )
 
-    def on_quote_fast_symbols(self):
+    def on_quote_fast_symbols(self, symbol_name):
         return send_functions.get_quote_fast_symbols(
             session_id=self._session_id,
-            symbols="FX:EURUSD"
+            symbols="FX_IDC:" + symbol_name
         )
 
     def on_create_study(self):
         return send_functions.get_create_study(
             chart_session_id=self._chart_session_id,
-            param1="st1",
-            param2="st1",
-            param3="s1",
+            param1="sds_1",
+            param2="s1",
+            param3="sds_sym_1",
             param4="Volume@tv-basicstudies-118",
             param5={"length": 20, "col_prev_close": "false"}
         )
