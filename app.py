@@ -4,15 +4,15 @@ import json
 import re
 import threading
 import time
-from datetime import datetime
+
 from websocket import WebSocketApp
 
 import constant
-from ast import literal_eval
 from lib import utils
 from lib.http.FakeHeader import FakeHeader
 from lib.websocket.dispatcher.open_dispatcher import WebSocketOpenDispatcher
 from lib.websocket.method import send_functions, dto
+from lib.websocket.method.types.timescaleupdate_types import TimeScaleUpdateTickData
 
 
 class TradingViewScrapingWebSocketApp(WebSocketApp):
@@ -42,37 +42,41 @@ class TradingViewScrapingWebSocketApp(WebSocketApp):
             ))
 
         rex_search_payload_length = re.search(r"~m~(?P<length>\d[0-9]+)~m~", recv_msg)
-
         if rex_search_payload_length is not None:
-
             if int(rex_search_payload_length.group('length')) > 1:
+
+                # each list in ['', 'length', 'data:dict', [...]]
                 recv_msg_split = re.split(r"~m~(?P<length>\d[0-9]+)~m~", recv_msg)
 
                 for token in recv_msg_split:
-                    try:
-                        token_to_obj = literal_eval(token)
-                        if isinstance(token_to_obj, dict):
-                            timescaleupdate_dto = dto.TimeScaleUpdateMessageDto(token_to_obj)
 
-                            if timescaleupdate_dto.parmeters.position2_of_key_in_s1_in_s:
-                                # 과거 데이터
-                                print("*" * 100)
-                                print(timescaleupdate_dto)
-                                for each in timescaleupdate_dto.parmeters.position2_of_key_in_s1_in_s:
-                                    print(datetime.fromtimestamp(each['v'][0]), each['v'])
+                    # Token이 Websocket의 payload인 경우
+                    if token.find("{") != -1:
+                        token = json.loads(token)
 
-                    except Exception as e:
-                        pass
-                        # token_to_json = json.dumps(token)
-                        # token_to_json = literal_eval(token_to_json)
-                        # print(token_to_json)
+                        # Method Name이 웹소켓 페이로드에 존재하는 경우
+                        # - 'm' 은 메소드 네임을 뜻함
+                        if 'm' in token and token['m'] == 'timescale_update':
+                            timescaleupdate_dto = dto.TimeScaleUpdateMessageDto(token)
 
-        self.health_check(recv_msg=recv_msg)
+                            if timescaleupdate_dto.p.position2:
+                                tick_list = [TimeScaleUpdateTickData(*(each['v'])) for each in
+                                             timescaleupdate_dto.p.position2_of_key_in_s1_in_s]
 
-        threading.Thread(
-            target=chart_left_shift,
-            daemon=True
-        ).start()
+                                if len(tick_list) > 2:
+                                    for tick in sorted(tick_list, reverse=True):
+                                        print(tick.to_humanize(), tick.open, tick.low)
+
+                                        if tick.date_time <= 31874400:
+                                            time.sleep(10)
+                                            exit()
+
+            self.health_check(recv_msg=recv_msg)
+
+            threading.Thread(
+                target=chart_left_shift,
+                daemon=True
+            ).start()
 
     def on_open(self, ws):
         websocketopendispatcher = WebSocketOpenDispatcher(

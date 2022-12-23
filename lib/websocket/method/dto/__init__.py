@@ -1,6 +1,8 @@
 from __future__ import annotations
 from ..types.timescaleupdate_types import TimeScaleUpdateDict
 
+from typing import Union, Dict, Optional
+
 from datetime import datetime
 
 
@@ -9,13 +11,13 @@ class TimeScaleUpdateMessageDto:
         self.recv_msg: TimeScaleUpdateDict = recv_msg
 
     @property
-    def method_name(self) -> str:
+    def m(self) -> str:
         return self.recv_msg.get('m', None)
 
     @property
-    def parmeters(self) -> TiemScaleUpdateMessageParamterData:
+    def p(self) -> Union[TiemScaleUpdateMessageParamterData, list]:
         parameter = self.recv_msg.get("p", None)
-        return TiemScaleUpdateMessageParamterData(parameter) if parameter is not None else None
+        return TiemScaleUpdateMessageParamterData(parameter) if parameter is not None else list()
 
     @property
     def t(self) -> int:
