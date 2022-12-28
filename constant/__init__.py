@@ -1,3 +1,5 @@
+from .symbol import SYMBOL_CODES_SELECT_28
+
 TRADING_VIEW_WSS_URL = "wss://data.tradingview.com/socket.io/websocket"
 TRADING_VIEW_HTTP_URL = "https://data.tradingview.com/socket.io/websocket"
 

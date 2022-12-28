@@ -44,27 +44,11 @@ class WebSocketOpenDispatcher:
         )
 
     def on_quote_add_symbols(self, symbol_name):
-        return send_functions.get_quote_add_symbols(
-            session_id=self._session_id,
-            symbols="FX:" + symbol_name,
-            flags={}
-            # flags={"flags": ['force_permission']}
-        )
-
-    def on_quote_add_symobls_v2(self, symbol_name):
         """
         symbol_name - > FX:EURUSD
         """
 
         # sendMessage(ws, "quote_add_symbols", [session, "BINANCE:BTCUSDT", {"flags": ['force_permission']}])
-
-        print("===" * 200)
-        print(send_functions.get_quote_add_symobls_v2(
-            chart_session_id=self._chart_session_id,
-            param1=f"FX:{symbol_name}",
-            param2={"flags": ["force_permission"]}
-        ))
-        print("===" * 200)
 
         return send_functions.get_quote_add_symobls_v2(
             chart_session_id=self._session_id,
@@ -78,7 +62,7 @@ class WebSocketOpenDispatcher:
         """
 
         # _template = '={"adjustment":"splits","sds_sym_1", "symbols":"FX:"%s"}' % symbol_name
-        _template2 =  "={\"symbol\":\"FX:%s\",\"adjustment\":\"splits\"}" % symbol_name
+        _template2 = "={\"symbol\":\"FX:%s\",\"adjustment\":\"splits\"}" % symbol_name
 
         return send_functions.get_resolve_symbol(
             chart_session_id=self._chart_session_id,

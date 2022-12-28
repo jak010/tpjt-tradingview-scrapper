@@ -27,3 +27,5 @@ def get_random_16_byte() -> bytes:
 
 def generator_sec_websocket_key() -> str:
     return base64.b64encode(get_random_16_byte()).decode()
+
+

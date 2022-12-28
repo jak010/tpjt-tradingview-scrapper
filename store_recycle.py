@@ -1,7 +1,9 @@
-import os
+""" store에 저장된 csv 파일에 저장된 마지막 연도별로 분류해주는 스크립트"""
 import csv
+import os
+import shutil
 
-storage_file = "/Users/jako/tesnine/opt/trading_view_scrapper/store"
+storage_file = "./store"
 
 csv_files = [name for name in os.listdir(storage_file)]
 
@@ -11,7 +13,6 @@ for csv_file in csv_files:
     with open(storage_file + "/" + csv_file, "r", encoding="utf8") as f:
         result = csv.reader(f, delimiter=",")
 
-        # humanize_times = [row[0] for row in result]
         last_index = [row for row in result]
 
         a = last_index[-1]
@@ -19,10 +20,6 @@ for csv_file in csv_files:
         a.append(csv_file)
 
         last_info.append(a)
-
-from pprint import pprint
-
-import shutil
 
 for row in last_info:
 
