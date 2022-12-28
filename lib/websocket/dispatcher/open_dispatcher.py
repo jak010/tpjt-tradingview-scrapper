@@ -46,9 +46,30 @@ class WebSocketOpenDispatcher:
     def on_quote_add_symbols(self, symbol_name):
         return send_functions.get_quote_add_symbols(
             session_id=self._session_id,
-            symbols="FX_IDC:" + symbol_name,
+            symbols="FX:" + symbol_name,
             flags={}
             # flags={"flags": ['force_permission']}
+        )
+
+    def on_quote_add_symobls_v2(self, symbol_name):
+        """
+        symbol_name - > FX:EURUSD
+        """
+
+        # sendMessage(ws, "quote_add_symbols", [session, "BINANCE:BTCUSDT", {"flags": ['force_permission']}])
+
+        print("===" * 200)
+        print(send_functions.get_quote_add_symobls_v2(
+            chart_session_id=self._chart_session_id,
+            param1=f"FX:{symbol_name}",
+            param2={"flags": ["force_permission"]}
+        ))
+        print("===" * 200)
+
+        return send_functions.get_quote_add_symobls_v2(
+            chart_session_id=self._session_id,
+            param1=f"FX:{symbol_name}",
+            param2='{"flags": ["force_permission"]}'
         )
 
     def on_resolve_symobl(self, symbol_name):
@@ -56,20 +77,21 @@ class WebSocketOpenDispatcher:
         symbol_name - > FX:EURUSD
         """
 
-        _template = '={"adjustment":"splits","sds_sym_1", "symbols":"FX:"%s"}' % symbol_name
+        # _template = '={"adjustment":"splits","sds_sym_1", "symbols":"FX:"%s"}' % symbol_name
+        _template2 =  "={\"symbol\":\"FX:%s\",\"adjustment\":\"splits\"}" % symbol_name
 
         return send_functions.get_resolve_symbol(
             chart_session_id=self._chart_session_id,
             param1="symbol_1",
-            param2=_template
+            param2=_template2
         )
 
     def on_create_series(self):
         return send_functions.get_create_series(
             chart_session_id=self._chart_session_id,
-            param1="sds_1",
+            param1="s1",
             param2="s1",
-            param3="sds_sym_1",
+            param3="symbol_1",
             param4="D",
             param5=300
         )
@@ -77,15 +99,15 @@ class WebSocketOpenDispatcher:
     def on_quote_fast_symbols(self, symbol_name):
         return send_functions.get_quote_fast_symbols(
             session_id=self._session_id,
-            symbols="FX_IDC:" + symbol_name
+            symbols="FX:" + symbol_name
         )
 
     def on_create_study(self):
         return send_functions.get_create_study(
             chart_session_id=self._chart_session_id,
-            param1="sds_1",
-            param2="s1",
-            param3="sds_sym_1",
+            param1="st1",
+            param2="st1",
+            param3="s1",
             param4="Volume@tv-basicstudies-118",
             param5={"length": 20, "col_prev_close": "false"}
         )

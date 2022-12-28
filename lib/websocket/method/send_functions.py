@@ -35,6 +35,19 @@ def get_quote_add_symbols(session_id, symbols, flags):
     ).get_payload()
 
 
+def get_quote_add_symobls_v2(chart_session_id, param1, param2):
+    """
+    Argument Example
+        param1 -> "symbol_1"
+        param2 -> "={\"symbol\":\"BINANCE:BTCUSDT\",\"adjustment\":\"splits\"}"
+
+    """
+    return Payload(
+        func='quote_add_symbols',
+        parameters=[chart_session_id, param1, param2]
+    ).get_payload()
+
+
 def get_quote_set_fields(session_id):
     return Payload(
         func='quote_set_fields',
@@ -51,6 +64,9 @@ def get_resolve_symbol(chart_session_id, param1, param2):
     Argument Example
         param1 -> "symbol_1"
         param2 -> "={\"symbol\":\"BINANCE:BTCUSDT\",\"adjustment\":\"splits\"}"
+
+    Return
+        [chart_session, "symbol_1", "={\"symbol\":\"FX:GBPUSD\",\"adjustment\":\"splits\"}"]
 
     """
     return Payload(
@@ -70,7 +86,7 @@ def get_create_series(chart_session_id, param1, param2, param3, param4, param5):
     """
     return Payload(
         func="create_series",
-        parameters=[chart_session_id, param1, param2, param3, param4, param5, ""]
+        parameters=[chart_session_id, param1, param2, param3, param4, param5]
     ).get_payload()
 
 
@@ -114,7 +130,7 @@ def get_request_more_tickmarks(chart_session_id):
 
 
 def get_request_more_data(chart_session_id):
-    _chunk_size = 150
+    _chunk_size = 200
     return Payload(
         func="request_more_data",
         parameters=[chart_session_id, "s1", _chunk_size]
