@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-import os
-import concurrent.futures
 import csv
 import json
+import os
 import re
 import threading
 import time
@@ -152,6 +151,30 @@ if __name__ == '__main__':
         'GBPUSD': '2',
         'USDJPY': '3',
         'GBPJPY': '4',
+        'USDCAD': '5',
+        'EURAUD': '6',
+        'EURJPY': '7',
+        'AUDCAD': '8',
+        'AUDJPY': '9',
+        'AUDNZD': '10',
+        'AUDUSD': '11',
+        'CADJPY': '12',
+        'EURCAD': '13',
+        'EURCHF': '14',
+        'EURGBP': '17',
+        'EURNZD': '20',
+        'GBPCAD': '24',
+        'GBPCHF': '25',
+        'NZDCAD': '26',
+        'NZDJPY': '27',
+        'NZDUSD': '28',
+        'USDCHF': '29',
+        'CHFJPY': '46',
+        'AUDCHF': '47',
+        'GBPNZD': '48',
+        'NZDCHF': '49',
+        'CADCHF': '103',
+        'GBPAUD': '107',
     }
 
     symbol_names = [symbol_name for symbol_name in SYMBOL_CODES_SELECT_28.keys()]
@@ -177,5 +200,17 @@ if __name__ == '__main__':
 
                 index_range.append((start_index, end_index))
 
-    for name in symbol_names:
-        task_app(name)
+    FIRST = symbol_names[0:10]
+    SECOND = symbol_names[10:20]
+    LAST = symbol_names[20:]
+
+    print(FIRST)
+    print(SECOND)
+    print(LAST)
+
+    import concurrent.futures
+
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+
+        for name in FIRST:
+            future = executor.submit(task_app, name)
