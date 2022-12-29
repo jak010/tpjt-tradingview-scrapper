@@ -12,10 +12,6 @@ class TimeScaleUpdateDict(TypedDict):
     t_ms: int
 
 
-class TimeScaleUpdateParmeter2(TypedDict):
-    s: dict
-
-
 @dataclass(order=True)
 class TimeScaleUpdateTickData:
     date_time: float

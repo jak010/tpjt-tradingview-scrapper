@@ -10,10 +10,6 @@ class TimeScaleUpdateMessageDto:
     def __init__(self, recv_msg):
         self.recv_msg: TimeScaleUpdateDict = recv_msg
 
-        print("*" * 100)
-        print(self.recv_msg)
-        print("*" * 100)
-
     @property
     def m(self) -> str:
         return self.recv_msg.get('m', None)
