@@ -60,8 +60,6 @@ class WebSocketOpenDispatcher:
         """
         symbol_name - > FX:EURUSD
         """
-
-        # _template = '={"adjustment":"splits","sds_sym_1", "symbols":"FX:"%s"}' % symbol_name
         _template2 = "={\"symbol\":\"FX:%s\",\"adjustment\":\"splits\"}" % symbol_name
 
         return send_functions.get_resolve_symbol(
