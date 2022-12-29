@@ -10,14 +10,18 @@ class TimeScaleUpdateMessageDto:
     def __init__(self, recv_msg):
         self.recv_msg: TimeScaleUpdateDict = recv_msg
 
+        print("*" * 100)
+        print(self.recv_msg)
+        print("*" * 100)
+
     @property
     def m(self) -> str:
         return self.recv_msg.get('m', None)
 
     @property
-    def p(self) -> Union[TiemScaleUpdateMessageParamterData, list]:
+    def p(self) -> Optional[TiemScaleUpdateMessageParamterData]:
         parameter = self.recv_msg.get("p", None)
-        return TiemScaleUpdateMessageParamterData(parameter) if parameter is not None else list()
+        return TiemScaleUpdateMessageParamterData(parameter) if parameter is not None else None
 
     @property
     def t(self) -> int:
@@ -28,7 +32,7 @@ class TimeScaleUpdateMessageDto:
         return self.recv_msg.get('t_ms', None)
 
     def __str__(self):
-        return f"{self.__class__.__name__}(t: {datetime.fromtimestamp(self.t)}, t_ms:{self.t_ms})"
+        return f"{self.__class__.__name__}(p:{self.p})"
 
 
 class TiemScaleUpdateMessageParamterData:

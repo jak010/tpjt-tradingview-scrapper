@@ -10,6 +10,12 @@ from lib.http.FakeHeader import FakeHeader
 from lib.websocket import TradingViewScrapingWebSocketApp
 from lib.websocket import utils as ws_utils
 
+# TradingView에서 연결을 제한하는 듯 보임
+# - Handshake status 429 Too Many Requests
+TRADING_VIEW_ENABLE_MAX_WORKER = 6  # MAX_WORKER의 수는 위 Error가 안 나는 수준에서 제한함
+SYMBOL_NAMES = [symbol_name for symbol_name in
+                constant.SYMBOL_CODES_SELECT_28.keys()]
+
 
 def task_app(symbol_name):
     app = TradingViewScrapingWebSocketApp(
@@ -22,20 +28,12 @@ def task_app(symbol_name):
 
 
 if __name__ == '__main__':
-    TRADING_VIEW_ENABLE_MAX_WORKER = 6
-    symbol_names = [symbol_name for symbol_name in
-                    constant.SYMBOL_CODES_SELECT_28.keys()]
-
-    cut_of_range: List[Tuple[int, int]] = ws_utils.cut_of_range_by_number(
-        symbol_names, TRADING_VIEW_ENABLE_MAX_WORKER
+    process_executor_bounds: List[Tuple[int, int]] = ws_utils.cut_of_range_by_number(
+        SYMBOL_NAMES, TRADING_VIEW_ENABLE_MAX_WORKER
     )
 
-    # TradingView에서 연결을 제한하는 듯 보임
-    # - Handshake status 429 Too Many Requests
-    #  - MAX_WORKER의 수는 위 Error가 안 나는 수준에서 제한함
-
     with concurrent.futures.ProcessPoolExecutor(6) as executor:
-        for start, end in cut_of_range:
-            print("[*] Current:", start, end, symbol_names[start:end])
-            futures = executor.map(task_app, symbol_names[start:end])
-            time.sleep(15)
+        for start, end in process_executor_bounds:
+            print("[*] Progress:", start, end, SYMBOL_NAMES[start:end])
+            futures = executor.map(task_app, SYMBOL_NAMES[start:end])
+            time.sleep(200)

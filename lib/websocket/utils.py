@@ -2,20 +2,25 @@ from __future__ import annotations
 
 import csv
 import os
+import re
 import time
-from typing import List, NoReturn
+from typing import List, NoReturn, Optional
 
 import websocket
-import re
+
+from lib.websocket.method import dto
 from lib.websocket.method import send_functions
 from lib.websocket.method.types.timescaleupdate_types import TimeScaleUpdateTickData
 
 
-def regex_search_ws_message_length(recv_msg):
+def regex_search(recv_msg):
     return re.search(r"~m~(?P<length>\d[0-9]+)~m~", recv_msg)
 
 
-def regex_split_ws_message_legnth(recv_msg) -> List[str]:
+def regex_split(recv_msg) -> List[str]:
+    """ Receieve 메시지 split 처리하기
+      Return -> ['', 'length', 'data:dict', ...]
+    """
     return re.split(r"~m~(?P<length>\d[0-9]+)~m~", recv_msg)
 
 
@@ -83,7 +88,22 @@ def token_is_start_brace(token) -> bool:
     return token.find("{") != -1
 
 
-def is_timescaleupdate_method_exist(token):
-    # Method Name이 웹소켓 페이로드에 존재하는 경우
-    # - 'm' 은 메소드 네임을 뜻하는 파라미터
-    return 'm' in token and token['m'] == 'timescale_update'
+def check_timescaleupdate_method(token) -> Optional[dto.TimeScaleUpdateMessageDto]:
+    """ Receieve 메시지에 "timescaleupdate" 함수가 존재하는지 체크 """
+    if 'm' in token and token['m'] == 'timescale_update':
+        return dto.TimeScaleUpdateMessageDto(token)
+
+
+def health_check(ws_app, recv_msg):
+    """ Connection 유지를 위한 Health Check """
+    pattern = re.compile("~m~\d+~m~~h~\d+$")
+    if pattern.match(recv_msg):
+        ws_app.send(recv_msg)
+
+
+def is_connect(start_time: int, close_second: int):
+    """ ws_app에서 지정한 시간이 지나면 connection 종료 """
+    current_time = int(time.time())
+    print(current_time - start_time, close_second)
+    if current_time - start_time >= close_second:
+        return True
