@@ -1,5 +1,4 @@
 from ..method import send_functions
-import json
 
 
 class WebSocketOpenDispatcher:

@@ -7,6 +7,18 @@ from datetime import datetime
 
 
 class TimeScaleUpdateMessageDto:
+    """
+        {
+            "m":"timescale_update",
+            "p" : {
+                "s1" : {
+                }
+            },
+            "t":None,
+            "t_ms":None
+        }
+    """
+
     def __init__(self, recv_msg):
         self.recv_msg: TimeScaleUpdateDict = recv_msg
 

@@ -8,9 +8,8 @@ from typing import List, NoReturn, Optional
 
 import websocket
 
-from lib.websocket.method import dto
-from lib.websocket.method import send_functions
-from lib.websocket.method.types.timescaleupdate_types import TimeScaleUpdateTickData
+from websocketlib.method import send_functions, dto
+from websocketlib.method.types.timescaleupdate_types import TimeScaleUpdateTickData
 
 
 def regex_search(recv_msg):

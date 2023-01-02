@@ -4,16 +4,15 @@ import json
 import threading
 import time
 
-import websocket
+import websocket as websocket_client
 
 import constant
-from lib.websocket import utils as ws_utils
-from lib.websocket.dispatcher.open_dispatcher import WebSocketOpenDispatcher
-from lib.websocket.method import dto
-from lib.websocket.method.types.timescaleupdate_types import TimeScaleUpdateTickData
+from websocketlib import utils as ws_utils
+from websocketlib.dispatcher.open_dispatcher import WebSocketOpenDispatcher
+from websocketlib.method.types.timescaleupdate_types import TimeScaleUpdateTickData
 
 
-class TradingViewScrapingWebSocketApp(websocket.WebSocketApp):
+class TradingViewScrapingWebSocketApp(websocket_client.WebSocketApp):
 
     def __init__(self, symbol_name: str, session_id, chart_session_id, fake_header):
         self.symbol_name = symbol_name

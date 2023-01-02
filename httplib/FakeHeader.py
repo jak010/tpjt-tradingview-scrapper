@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ..utils import generator_sec_websocket_key
+from com.utils import generator_sec_websocket_key
 
 
 class FakeHeader:

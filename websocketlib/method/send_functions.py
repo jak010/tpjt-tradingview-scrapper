@@ -1,4 +1,4 @@
-from lib.websocket.message.payload import Payload
+from websocketlib.message.payload import Payload
 
 
 def get_authorized_token():

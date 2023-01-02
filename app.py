@@ -5,10 +5,10 @@ import time
 from typing import List, Tuple
 
 import constant
-from lib import utils
-from lib.http.FakeHeader import FakeHeader
-from lib.websocket import TradingViewScrapingWebSocketApp
-from lib.websocket import utils as ws_utils
+from com import utils
+from httplib import FakeHeader
+from websocketlib import TradingViewScrapingWebSocketApp
+from websocketlib import utils as ws_utils
 
 # TradingView에서 연결을 제한하는 듯 보임
 # - Handshake status 429 Too Many Requests
