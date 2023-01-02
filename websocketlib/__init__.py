@@ -25,7 +25,7 @@ class TradingViewScrapingWebSocketApp(websocket_client.WebSocketApp):
         self.start_time = int(time.time())
 
         super().__init__(
-            url=constant.TRADING_VIEW_WSS_URL + constant.TEST_PARAM2,
+            url=constant.TRADINGVIEW_URL.WSS_URL + constant.TRADINGVIEW_URL.TEST_PARAM2,
             header=self.fake_header,
             on_message=self.on_message,
             on_close=self.on_close,
@@ -58,9 +58,11 @@ class TradingViewScrapingWebSocketApp(websocket_client.WebSocketApp):
 
                         timescaleupdate_dto = ws_utils.check_timescaleupdate_method(token)
                         if timescaleupdate_dto and timescaleupdate_dto is not None:
+                            # print(timescaleupdate_dto.p.position2_of_key_in_s1_in_s)
+
                             tick_list = [TimeScaleUpdateTickData(*(each['v'])) for each in
                                          timescaleupdate_dto.p.position2_of_key_in_s1_in_s]
-
+                            #
                             ws_utils.csv_save(
                                 symbol_name=self.symbol_name,
                                 tick_list=tick_list
@@ -74,23 +76,14 @@ class TradingViewScrapingWebSocketApp(websocket_client.WebSocketApp):
     def on_open(self, ws):
         websocketopendispatcher = WebSocketOpenDispatcher(
             session_id=self._session_id,
-            chart_session_id=self._chart_session_id
+            chart_session_id=self._chart_session_id,
+            symbol_name=self.symbol_name
         )
         try:
             # WebSocket 연결 시 전송하는 메서드
-            # - send 순서는 아래 정의된 순서에 따라야됨
-            self.send(websocketopendispatcher.on_authorized_token)
-            self.send(websocketopendispatcher.on_chart_create_session)
-            self.send(websocketopendispatcher.on_quote_create_session)
-            self.send(websocketopendispatcher.on_quote_set_fields)
+            for tradingview_method in websocketopendispatcher.open_method_list():
+                self.send(tradingview_method)
 
-            self.send(websocketopendispatcher.on_quote_add_symbols(symbol_name=self.symbol_name))
-            self.send(websocketopendispatcher.on_resolve_symobl(symbol_name=self.symbol_name))
-            self.send(websocketopendispatcher.on_create_series())
-
-            self.send(websocketopendispatcher.on_quote_fast_symbols(symbol_name=self.symbol_name))
-            self.send(websocketopendispatcher.on_create_study())
-            self.send(websocketopendispatcher.on_quote_hibernate_all)
         except Exception as e:
             print(e)
             self.close()

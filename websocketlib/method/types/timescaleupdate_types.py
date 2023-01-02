@@ -20,7 +20,6 @@ class TimeScaleUpdateTickData:
     high: float
     low: float
     close: float
-    volume: float
 
     def to_humanize(self) -> datetime:
         return datetime.fromtimestamp(self.date_time)

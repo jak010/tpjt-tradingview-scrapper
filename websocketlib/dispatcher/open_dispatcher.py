@@ -10,9 +10,29 @@ class WebSocketOpenDispatcher:
         'quote_fast_symbols','create_study','quote_hibernate_all'
     """
 
-    def __init__(self, session_id, chart_session_id):
+    def __init__(self, session_id, chart_session_id, symbol_name: str):
         self._session_id = session_id
         self._chart_session_id = chart_session_id
+        self._symbol_name = symbol_name
+        self._broker_name = 'FOREXCOM'
+
+    def open_method_list(self) -> list:
+        """ 호출 순서는 orders에 정의된 순서여야함 """
+        orders = [
+            self.on_authorized_token,
+            self.on_chart_create_session,
+            self.on_quote_create_session,
+            self.on_quote_set_fields,
+
+            self.on_quote_add_symbols,
+            self.on_resolve_symobl,
+            self.on_create_series,
+
+            self.on_quote_fast_symbols,
+            self.on_create_study,
+            self.on_quote_hibernate_all
+        ]
+        return orders
 
     @property
     def on_authorized_token(self) -> str:
@@ -42,7 +62,8 @@ class WebSocketOpenDispatcher:
             session_id=self._session_id
         )
 
-    def on_quote_add_symbols(self, symbol_name):
+    @property
+    def on_quote_add_symbols(self):
         """
         symbol_name - > FX:EURUSD
         """
@@ -51,15 +72,16 @@ class WebSocketOpenDispatcher:
 
         return send_functions.get_quote_add_symobls_v2(
             chart_session_id=self._session_id,
-            param1=f"FX:{symbol_name}",
+            param1=f"{self._broker_name}:{self._symbol_name}",
             param2='{"flags": ["force_permission"]}'
         )
 
-    def on_resolve_symobl(self, symbol_name):
+    @property
+    def on_resolve_symobl(self):
         """
         symbol_name - > FX:EURUSD
         """
-        _template2 = "={\"symbol\":\"FX:%s\",\"adjustment\":\"splits\"}" % symbol_name
+        _template2 = "={\"symbol\":\"%s:%s\",\"adjustment\":\"splits\"}" % (self._broker_name, self._symbol_name)
 
         return send_functions.get_resolve_symbol(
             chart_session_id=self._chart_session_id,
@@ -67,6 +89,7 @@ class WebSocketOpenDispatcher:
             param2=_template2
         )
 
+    @property
     def on_create_series(self):
         return send_functions.get_create_series(
             chart_session_id=self._chart_session_id,
@@ -77,12 +100,14 @@ class WebSocketOpenDispatcher:
             param5=300
         )
 
-    def on_quote_fast_symbols(self, symbol_name):
+    @property
+    def on_quote_fast_symbols(self):
         return send_functions.get_quote_fast_symbols(
             session_id=self._session_id,
-            symbols="FX:" + symbol_name
+            symbols=self._broker_name + ":" + self._symbol_name
         )
 
+    @property
     def on_create_study(self):
         return send_functions.get_create_study(
             chart_session_id=self._chart_session_id,

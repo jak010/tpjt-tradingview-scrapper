@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from typing import Iterator
 import csv
 import os
 import re
@@ -64,8 +65,7 @@ def cut_of_range_by_number(symbol_names: List[str], max_worker):
 
 
 def root_dir():
-    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    return os.path.dirname(BASE_DIR)
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def csv_save(symbol_name, tick_list: List[TimeScaleUpdateTickData]):
@@ -74,12 +74,12 @@ def csv_save(symbol_name, tick_list: List[TimeScaleUpdateTickData]):
     _SAVE_FILE_PATH = root_dir() + "/store" + _SAVE_FILE_NAME
 
     for tick in sorted(tick_list, reverse=True):
-        with open(_SAVE_FILE_PATH, "a", encoding="utf-8",
+        with open(_SAVE_FILE_PATH, "a+", encoding="utf-8",
                   newline='') as f:
             c = csv.writer(f)
             c.writerow([
-                tick.to_humanize(), tick.date_time, tick.open, tick.high,
-                tick.low, tick.close, tick.volume
+                tick.to_humanize(), tick.date_time,
+                tick.open, tick.high, tick.close, tick.low
             ])
 
 

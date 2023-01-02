@@ -6,7 +6,7 @@ from typing import List, Tuple
 
 import constant
 from com import utils
-from httplib import FakeHeader
+from httplib.fake_header import FakeHeader
 from websocketlib import TradingViewScrapingWebSocketApp
 from websocketlib import utils as ws_utils
 
